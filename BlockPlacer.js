@@ -1,11 +1,12 @@
 var out = "Output String\n";
 
-var x = 7;
-var y = 3;
+var x = 15;
+var y = 10;
 var box = [];
-var blocks = [[3,3], [2,1]];
+var blocks = [[3,3], [1, 5], [6, 7]];
 var nPlaced = 0;
 var moves = [];
+var startTime = performance.now();
 
 /*
 Error Definitions:
@@ -16,7 +17,7 @@ Out Of Bounds Error: Thrown when you attempt to print to a cell not in the box
 var placeBlock = function(x, y, block, box, token, force){
     if(y > box.length || x > box[0].length) {return box;} //even when forced, this makes no sense
 
-    console.log("placing");
+   // console.log("placing");
     for(var i = 0; i < block[0]; i++){
         for(var j = 0; j < block[1]; j++){
             if(i + x < box[0].length && j + y < box.length){
@@ -76,7 +77,10 @@ var makeMove = function(x, y, blockId, box, token){
 }
 
 var undoMove = function(box){
-    out += "undo\n";
+    //out += "undo\n";
+    if(moves.length === 0){
+        throw "No Moves To Undo";
+    }
     var move = moves.pop();
     // if(blocks[move[2]] + 1 >= blocks.length){
     //
@@ -129,40 +133,74 @@ var getNextSpot = function(box, start){
 }
 
 var isFull = function(box){
-    return Array.isArray(getNextSpot(box, [0,0]));
+    for(var i = 0; i < box.length; i++) {
+        for (var j = 0; j < box[0].length; j++) {
+            if (box[i][j] === '0') return false;
+        }
+    }
+    return true;
 }
 
 
-var printPossibleBoxes = function(box) {
-
+var getPossibleBoxes = function(box) {
+    var solutions = [];
     var spot = getNextSpot(box);
     var lim = 0;
     var backup = duplicate(box);
     var nextMove = 0;
-    while (Array.isArray(spot) && lim++ < 100) {
-        console.log(spot);
-        printBox(box);
+    var looking = true;
+    while (looking) {
+        //console.log(spot);
+        //printBox(box);
         try {
             backup = duplicate(box);
             box = makeMove(spot[0], spot[1], nextMove, box, '' + ++nPlaced);
             nextMove = 0;
         } catch(error){
-            out += error + "\n";
+            //out += error + "\n";
             print();
             box = duplicate(backup);
             if(nextMove + 1 <= blocks.length){
                 nextMove++;
             } else {
+                try {
+                    var result = revert(box);
+                    box = result[1];
+                    nextMove = result[0];
+                } catch(error){
+                    //console.log(error)
+                    looking = false;
+                }
+            }
+        }
+        if(isFull(box)){
+            console.log("solution");
+            solutions.push(duplicate(box));
+        }
+        spot = getNextSpot(box);
+        if(!Array.isArray(spot)){
+            try {
                 var result = revert(box);
                 box = result[1];
                 nextMove = result[0];
+            } catch(error){
+                //console.log(error)
+                looking = false;
             }
         }
 
-        spot = getNextSpot(box);
 
     }
-    return box;
+    return solutions;
+}
+
+var printSolutions = function(solutions){
+    out += "\n Solutions\n"
+    /*for(var sol in solutions){
+        printBox(solutions[sol]);
+    }*/
+    console.log(solutions);
+    console.log(performance.now() - startTime)
 }
 
 var duplicate = function(ar){
@@ -187,6 +225,4 @@ print();
 
 
 box = fillBox(x, y, box, '0');
-box = printPossibleBoxes(box);
-
-printBox(box);
+//printSolutions(getPossibleBoxes(box));

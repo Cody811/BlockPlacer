@@ -1,0 +1,22 @@
+body {
+    background-color: #ffffff;
+}
+
+.contentSheet {
+    background-color: #f0f0f5;
+    position: absolute;
+    height: calc(100% - 1% - 55px);
+    width: 80%;
+    margin-top: calc(50px + 1%);
+    margin-left: 10%;
+    margin-right: 10%;
+}
+
+.line {
+    height: 2px;
+    background-color: black;
+}
+
+.mainTitle {
+    text-align: center;
+}
