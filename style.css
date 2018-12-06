@@ -3,20 +3,94 @@ body {
 }
 
 .contentSheet {
+    overflow: hidden;
     background-color: #f0f0f5;
     position: absolute;
     height: calc(100% - 1% - 55px);
     width: 80%;
-    margin-top: calc(50px + 1%);
+    margin-top: 50px;
     margin-left: 10%;
     margin-right: 10%;
 }
 
 .line {
     height: 2px;
-    background-color: black;
+    background-color: #000000;
+}
+
+.inputBundle {
+    margin: 0 auto;
+    width: 80%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.gridItem {
+    border: 1px solid #aaaaaa;
+    padding: 1rem;
+    text-align: center;
+}
+
+.inputTable {
+    margin: 0 auto;
+}
+
+.inputBundle .line {
+    height: 1px;
+    background-color: #AAAAAA;
+}
+
+.standardSlider {
+
+}
+
+.sliderHouse {
+    float: right;
+    padding-right: 2rem;
+}
+
+.sliderTitle {
+    width:10rem;
+
+    float: left
+}
+.subTitle {
+    text-align: center;
 }
 
 .mainTitle {
     text-align: center;
+}
+
+.trinketSlider {
+    width:100%;
+    height: 3rem;
+}
+
+.outputBox {
+    border: #aaaaaa 1px solid;
+    position: relative;
+    top: 5%;
+}
+
+
+#mazeBox {
+    top: 3rem;
+    text-align: center;
+    position: relative;
+}
+
+#previewBox {
+    text-align: center;
+    position: relative;
+}
+
+canvas {
+   /* max-width:50% !important;
+    max-height:50% !important; */
+}
+
+th {
+    border: #aaaaaa 1px solid;
+    min-width: 40rem;
 }
