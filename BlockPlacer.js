@@ -45,7 +45,6 @@ var box = [];
 var blocks = [[3, 3]];
 var nPlaced = 0;
 var moves = [];
-var startTime = performance.now();
 
 /*
 Error Definitions:
@@ -71,7 +70,17 @@ var placeBlock = function(x, y, block, box, token, force){
         }
     }
     return box;
-}
+};
+
+/**
+ * Fills box with token and the given size
+ * Used for initializing but could be used elsewhere
+ * @param x dimension
+ * @param y dimension
+ * @param box the array
+ * @param token the token to fill
+ * @returns filled box
+ */
 
 var fillBox = function(x, y, box, token){
     box = [];
@@ -85,30 +94,30 @@ var fillBox = function(x, y, box, token){
     return box;
 };
 
-
-var print = function(){
-    document.getElementById("out").innerText = out;
-};
-
 var makeMove = function(x, y, blockId, box, token){
         var afterBox = placeBlock(x, y, blocks[blockId], box, token, false);
         moves.push([x, y, blockId, token]);
         return afterBox;
+};
 
-
-
-}
-
+/**
+ Undoes one move
+ Should normally not be called directly, use revert()
+ */
 var undoMove = function(box){
-    //out += "undo\n";
     if(moves.length === 0){
         throw "No Moves To Undo";
     }
     var move = moves.pop();
     box = placeBlock(move[0], move[1], blocks[move[2]], box, '0', true);
     return [move[2] + 1, box];
-}
+};
 
+/**
+ * Utility to undo one move. Adds some saftey
+ * @param box
+ * @returns box with one move undone
+ */
 var revert = function(box){
     var result = undoMove(box);
     var nextMove = result[0];
@@ -131,7 +140,7 @@ var getNextSpot = function(box, start){
         start[0] = 0;
     }
     return "No Start Found, Full After Start";
-}
+};
 
 var isFull = function(box){
     for(var i = 0; i < box.length; i++) {
@@ -140,15 +149,14 @@ var isFull = function(box){
         }
     }
     return true;
-}
+};
 
 var clearBlocks = function(){
     blocks = [];
     answer.innerText = "";
-}
+};
 
-
-var getPossibleBoxes = function(box, getFirst) {
+var getPossibleSolutions = function(box, getFirst) {
     var solutions = [];
     var spot = getNextSpot(box);
     var lim = 0;
@@ -198,14 +206,26 @@ var getPossibleBoxes = function(box, getFirst) {
     return solutions;
 };
 
+/* Used for the button outputs */
 var isItPossible = function(){
     box = fillBox(width, height, box, '0');
     answer = document.getElementById("answer");
     answer.innerText = "thinking...";
-    answer.innerText = getPossibleBoxes(box, true).length > 0 ? "Yes" : "No";
-    displaySolution(getPossibleBoxes(box, true));
+    var solutions = getPossibleSolutions(box, true);
+    answer.innerText = solutions.length > 0 ? "Yes" : "No";
+    downloadCanvas(displaySolution(solutions));
 };
 
+var findAllSolutions = function(){
+    box = fillBox(width, height, box, '0');
+    downloadCanvas(displaySolution(getPossibleSolutions(box)));
+};
+/* */
+
+/**
+ *  Adds Blocks to list
+ *  Sorts the list by area
+ */
 var addBlock = function(){
     if(blocks.length < 5){
         answer.innerText = "";
@@ -221,10 +241,11 @@ var addBlock = function(){
     }
 };
 
-var printSolutions = function(solutions){
-    console.log(solutions);
-    console.log(performance.now() - startTime)
-};
+/**
+ * Duplicates an array and returns a copy
+ * @param ar starting array
+ * @returns duplicated array
+ */
 
 var duplicate = function(ar){
     var newArray = ar.map(function(arr) {
@@ -233,38 +254,13 @@ var duplicate = function(ar){
     return newArray;
 };
 
-var findAllSolutions = function(){
-    box = fillBox(width, height, box, '0');
-    downloadCanvas(displaySolution(getPossibleBoxes(box)));
-};
-/*    */
+
+/**
+ * Returns a canvas of the drawn solutions using unique colors
+ * @params solutions an array of solutions to the box problem
+ * @returns canvas
+ */
 var displaySolution = function(solutions){
-    var getD = function(){
-        return Math.floor(Math.random() * 5);
-    };
-
-    var getAr = function(size){
-        var ar = [];
-        for(var i = 0; i < size; i++){
-            ar.push(getD())
-        }
-        return ar;
-    }
-    var getDoubleAr = function(height, width){
-        var ar = [];
-        for(var i = 0; i < height; i++){
-            ar.push(getAr(width))
-        }
-        return ar;
-    }
-
-    var getSampleOut = function(amount, height, width){
-        var ar = [];
-        for(var i = 0; i < amount; i++){
-            ar.push(getDoubleAr(height, width))
-        }
-        return ar;
-    }
 
     var colorCode = {};
     var xIndex = 0;
@@ -353,11 +349,11 @@ function draw() {
     var offsetY = 100;
 
     for(var i = 0; i <= height; i++){
-        line(offsetX ,offsetY + ((0 + i) * scale), (width * scale) + offsetX,offsetY + ((0 + i) *  scale))
+        line(offsetX ,offsetY + (i * scale), (width * scale) + offsetX,offsetY + (i *  scale))
     }
 
     for(var j = 0; j <= width; j++){
-        line(offsetX + ((0 + j) * scale),  offsetY, offsetX + ((0 + j) * scale), offsetY + (height * scale))
+        line(offsetX + (j * scale),  offsetY, offsetX + (j * scale), offsetY + (height * scale))
     }
 
     /* The Preview */
@@ -367,7 +363,7 @@ function draw() {
     var preWidth = parseInt(blockWidthSlider.value);
 
     for(var i = 0; i <= preWidth; i++){
-        line(offsetX ,offsetY + ((0 + i) * scale), (preHeight * scale) + offsetX,offsetY + ((0 + i) *  scale))
+        line(offsetX ,offsetY + (i * scale), (preHeight * scale) + offsetX,offsetY + (i *  scale))
     }
     for(var i = 0; i <= preHeight; i++){
         line(offsetX + ((i) * scale),  offsetY, offsetX + ((i) * scale), offsetY + (preWidth * scale))
@@ -379,7 +375,7 @@ function draw() {
     for(var b in blocks){
         var block = blocks[b];
         for(var i = 0; i <= block[1]; i++){
-            line(offsetX ,offsetY + ((0 + i) * scale), (block[0] * scale) + offsetX,offsetY + ((0 + i) *  scale))
+            line(offsetX ,offsetY + (i * scale), (block[0] * scale) + offsetX,offsetY + (i *  scale))
         }
         for(var i = 0; i <= block[0]; i++){
             line(offsetX + ((i) * scale),  offsetY, offsetX + ((i) * scale), offsetY + (block[1] * scale))
@@ -392,4 +388,3 @@ function draw() {
 }
 
 box = fillBox(width, height, box, '0');
-printSolutions(getPossibleBoxes(box));
